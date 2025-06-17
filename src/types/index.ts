@@ -1,37 +1,61 @@
 
+// Updated types for the C2C parking booking platform
+
+export interface Profile {
+  id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  user_type: 'host' | 'guest' | 'both';
+  avatar_url?: string;
+  bio?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ParkingSpot {
   id: string;
-  name: string;
+  owner_id: string;
+  title: string;
+  description?: string;
+  spot_type: 'driveway' | 'garage' | 'street' | 'lot' | 'covered';
   address: string;
-  price: number;
-  priceType: 'hour' | 'day' | 'month';
-  totalSlots: number;
-  availableSlots: number;
-  rating: number;
-  reviewCount: number;
+  latitude?: number;
+  longitude?: number;
+  hourly_rate: number;
+  daily_rate?: number;
+  is_available: boolean;
   images: string[];
   amenities: string[];
-  openingHours: string;
-  phone?: string;
-  description: string;
-  lat: number;
-  lng: number;
-  ownerId: string;
-  isActive: boolean;
+  instructions?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Booking {
   id: string;
-  spotId: string;
-  userId: string;
-  startTime: string;
-  endTime: string;
-  vehicleId: string;
-  totalCost: number;
-  status: 'pending' | 'active' | 'completed' | 'cancelled';
-  qrCode: string;
-  pin: string;
-  createdAt: string;
+  spot_id: string;
+  guest_id: string;
+  host_id: string;
+  start_time: string;
+  end_time: string;
+  total_amount: number;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  guest_notes?: string;
+  host_notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Review {
+  id: string;
+  booking_id: string;
+  reviewer_id: string;
+  reviewee_id: string;
+  rating: number;
+  comment?: string;
+  is_host_review: boolean;
+  created_at: string;
 }
 
 export interface Vehicle {
@@ -42,6 +66,7 @@ export interface Vehicle {
   color: string;
 }
 
+// Legacy types for backward compatibility - will be gradually phased out
 export interface User {
   id: string;
   name: string;
@@ -52,16 +77,6 @@ export interface User {
   vehicles?: Vehicle[];
 }
 
-export interface Review {
-  id: string;
-  userId: string;
-  spotId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  userName: string;
-}
-
 export interface AuthUser {
   id: string;
   name: string;
@@ -69,4 +84,23 @@ export interface AuthUser {
   phone?: string;
   userType: 'customer' | 'owner';
   vehicles?: Vehicle[];
+}
+
+// Filter and search types
+export interface SpotFilters {
+  location?: string;
+  spot_type?: 'driveway' | 'garage' | 'street' | 'lot' | 'covered';
+  max_hourly_rate?: number;
+  amenities?: string[];
+  start_date?: string;
+  end_date?: string;
+}
+
+export interface BookingRequest {
+  spot_id: string;
+  host_id: string;
+  start_time: string;
+  end_time: string;
+  total_amount: number;
+  guest_notes?: string;
 }
