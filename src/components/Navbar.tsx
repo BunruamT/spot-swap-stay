@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MapPin, User, Calendar, Settings, Home, LogOut, Bell, Clock, Menu, X } from 'lucide-react';
@@ -16,7 +17,7 @@ interface Notification {
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -77,7 +78,7 @@ export const Navbar: React.FC = () => {
     
     // Filter notifications based on user type
     const filteredNotifications = mockNotifications.filter(notification => {
-      if (user?.userType === 'owner') {
+      if (profile?.user_type === 'host' || profile?.user_type === 'both') {
         return ['owner_notification', 'system'].includes(notification.type);
       } else {
         return ['booking_reminder', 'extension_reminder', 'system'].includes(notification.type);
@@ -104,14 +105,14 @@ export const Navbar: React.FC = () => {
     if (Math.random() < 0.1) { // 10% chance
       const newNotification: Notification = {
         id: Date.now().toString(),
-        type: user.userType === 'owner' ? 'owner_notification' : 'booking_reminder',
-        title: user.userType === 'owner' ? 'New Booking' : 'Parking Reminder',
-        message: user.userType === 'owner' 
+        type: profile?.user_type === 'host' || profile?.user_type === 'both' ? 'owner_notification' : 'booking_reminder',
+        title: profile?.user_type === 'host' || profile?.user_type === 'both' ? 'New Booking' : 'Parking Reminder',
+        message: profile?.user_type === 'host' || profile?.user_type === 'both'
           ? 'New booking received for your parking spot'
           : 'Don\'t forget about your upcoming parking reservation',
         time: 'Just now',
         unread: true,
-        actionUrl: user.userType === 'owner' ? '/admin/bookings' : '/bookings'
+        actionUrl: profile?.user_type === 'host' || profile?.user_type === 'both' ? '/admin/bookings' : '/bookings'
       };
       
       setNotifications(prev => [newNotification, ...prev]);
@@ -142,8 +143,8 @@ export const Navbar: React.FC = () => {
     setShowNotifications(false);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     setShowUserMenu(false);
     setShowMobileMenu(false);
     navigate('/login');
@@ -278,15 +279,15 @@ export const Navbar: React.FC = () => {
                   className="flex items-center space-x-2 p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <User className="h-5 w-5" />
-                  <span className="text-sm font-medium">{user?.name}</span>
+                  <span className="text-sm font-medium">{profile?.full_name || 'User'}</span>
                 </button>
 
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                     <div className="p-3 border-b border-gray-200">
-                      <p className="font-semibold text-gray-900">{user?.name}</p>
-                      <p className="text-sm text-gray-600">{user?.email}</p>
-                      <p className="text-xs text-blue-600 capitalize">{user?.userType}</p>
+                      <p className="font-semibold text-gray-900">{profile?.full_name || 'User'}</p>
+                      <p className="text-sm text-gray-600">{profile?.email}</p>
+                      <p className="text-xs text-blue-600 capitalize">{profile?.user_type || 'guest'}</p>
                     </div>
                     <div className="py-2">
                       <Link
@@ -297,7 +298,7 @@ export const Navbar: React.FC = () => {
                         <User className="h-4 w-4" />
                         <span>Profile</span>
                       </Link>
-                      {user?.userType === 'customer' && (
+                      {(profile?.user_type === 'guest' || profile?.user_type === 'both') && (
                         <Link
                           to="/bookings"
                           className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -307,7 +308,7 @@ export const Navbar: React.FC = () => {
                           <span>My Bookings</span>
                         </Link>
                       )}
-                      {user?.userType === 'owner' && (
+                      {(profile?.user_type === 'host' || profile?.user_type === 'both') && (
                         <Link
                           to="/admin"
                           className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -387,9 +388,9 @@ export const Navbar: React.FC = () => {
                     <User className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{user?.name}</p>
-                    <p className="text-sm text-gray-600">{user?.email}</p>
-                    <p className="text-xs text-blue-600 capitalize">{user?.userType}</p>
+                    <p className="font-semibold text-gray-900">{profile?.full_name || 'User'}</p>
+                    <p className="text-sm text-gray-600">{profile?.email}</p>
+                    <p className="text-xs text-blue-600 capitalize">{profile?.user_type || 'guest'}</p>
                   </div>
                 </div>
               </div>
@@ -408,7 +409,7 @@ export const Navbar: React.FC = () => {
                 <span>Home</span>
               </Link>
 
-              {user?.userType === 'customer' && (
+              {(profile?.user_type === 'guest' || profile?.user_type === 'both') && (
                 <Link
                   to="/bookings"
                   className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium transition-colors ${
@@ -423,7 +424,7 @@ export const Navbar: React.FC = () => {
                 </Link>
               )}
 
-              {user?.userType === 'owner' && (
+              {(profile?.user_type === 'host' || profile?.user_type === 'both') && (
                 <Link
                   to="/admin"
                   className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium transition-colors ${

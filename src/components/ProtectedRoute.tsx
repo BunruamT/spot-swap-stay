@@ -1,17 +1,18 @@
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireOwner?: boolean;
+  requireHost?: boolean;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requireOwner = false 
+  requireHost = false 
 }) => {
-  const { user, isLoading } = useAuth();
+  const { user, profile, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -25,7 +26,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
-  if (requireOwner && user.userType !== 'owner') {
+  if (requireHost && profile?.user_type !== 'host' && profile?.user_type !== 'both') {
     return <Navigate to="/" replace />;
   }
 

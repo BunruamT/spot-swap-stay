@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { QrCode, Hash, Check, X, AlertCircle, User, MapPin, Clock, Car } from 'lucide-react';
 import { database } from '../data/database';
-import { Booking, ParkingSpot } from '../types';
+import { Booking, ParkingSpot } from '../services/supabaseService';
 
 interface QRScannerProps {
   onScan: (data: string) => void;
@@ -49,8 +50,8 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
       }
 
       // Get spot and customer details
-      const spot = await database.getParkingSpotById(booking.spotId);
-      const customer = await database.getUserById(booking.userId);
+      const spot = await database.getParkingSpotById(booking.spot_id);
+      const customer = await database.getUserById(booking.guest_id);
 
       if (!spot || !customer) {
         setError('Booking details not found.');
@@ -99,11 +100,11 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
 
     setIsProcessing(true);
     try {
-      // Update booking status to active (if it was pending) or completed
-      const newStatus = bookingDetails.booking.status === 'pending' ? 'active' : 'completed';
+      // Update booking status to confirmed (if it was pending) or completed
+      const newStatus = bookingDetails.booking.status === 'pending' ? 'confirmed' : 'completed';
       await database.updateBookingStatus(bookingDetails.booking.id, newStatus);
       
-      onScan(bookingDetails.booking.qrCode);
+      onScan(`QR_${bookingDetails.booking.id}`);
       setBookingDetails(null);
       if (onClose) onClose();
     } catch (error) {
@@ -122,8 +123,8 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
   };
 
   if (bookingDetails) {
-    const startDateTime = formatDateTime(bookingDetails.booking.startTime);
-    const endDateTime = formatDateTime(bookingDetails.booking.endTime);
+    const startDateTime = formatDateTime(bookingDetails.booking.start_time);
+    const endDateTime = formatDateTime(bookingDetails.booking.end_time);
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -152,7 +153,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-gray-600" />
                 <span className="text-sm text-gray-600">Location:</span>
-                <span className="font-medium">{bookingDetails.spot.name}</span>
+                <span className="font-medium">{bookingDetails.spot.title}</span>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -167,7 +168,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
                 <Car className="h-4 w-4 text-gray-600" />
                 <span className="text-sm text-gray-600">Status:</span>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  bookingDetails.booking.status === 'active' ? 'bg-green-100 text-green-800' :
+                  bookingDetails.booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
                   bookingDetails.booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                   'bg-gray-100 text-gray-800'
                 }`}>
@@ -178,7 +179,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
               <div className="pt-2 border-t border-gray-200">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Total Amount:</span>
-                  <span className="font-bold text-lg">${bookingDetails.booking.totalCost}</span>
+                  <span className="font-bold text-lg">${bookingDetails.booking.total_amount}</span>
                 </div>
               </div>
             </div>

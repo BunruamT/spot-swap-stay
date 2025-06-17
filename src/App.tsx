@@ -21,7 +21,7 @@ import { AdminReviewsPage } from './pages/AdminReviewsPage';
 import NotFound from './pages/NotFound';
 
 const AppContent: React.FC = () => {
-  const { user, isLoading } = useAuth();
+  const { user, profile, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -39,7 +39,7 @@ const AppContent: React.FC = () => {
         <Route path="/landing" element={<LandingPage />} />
         <Route 
           path="/login" 
-          element={user ? <Navigate to={user.userType === 'owner' ? '/admin' : '/'} replace /> : <LoginPage />} 
+          element={user ? <Navigate to={profile?.user_type === 'host' ? '/admin' : '/'} replace /> : <LoginPage />} 
         />
         
         {/* Protected Routes with Navbar */}
@@ -90,7 +90,7 @@ const AppContent: React.FC = () => {
         
         {/* Owner-only routes */}
         <Route path="/admin" element={
-          <ProtectedRoute requireOwner>
+          <ProtectedRoute requireHost>
             <Navbar />
             <div className="pt-16">
               <AdminDashboard />
@@ -99,7 +99,7 @@ const AppContent: React.FC = () => {
         } />
         
         <Route path="/admin/add-spot" element={
-          <ProtectedRoute requireOwner>
+          <ProtectedRoute requireHost>
             <Navbar />
             <div className="pt-16">
               <AddParkingSpot />
@@ -108,7 +108,7 @@ const AppContent: React.FC = () => {
         } />
         
         <Route path="/admin/edit-spot/:id" element={
-          <ProtectedRoute requireOwner>
+          <ProtectedRoute requireHost>
             <Navbar />
             <div className="pt-16">
               <EditParkingSpot />
@@ -117,7 +117,7 @@ const AppContent: React.FC = () => {
         } />
         
         <Route path="/admin/availability/:id" element={
-          <ProtectedRoute requireOwner>
+          <ProtectedRoute requireHost>
             <Navbar />
             <div className="pt-16">
               <ManageAvailability />
@@ -126,7 +126,7 @@ const AppContent: React.FC = () => {
         } />
         
         <Route path="/admin/bookings" element={
-          <ProtectedRoute requireOwner>
+          <ProtectedRoute requireHost>
             <Navbar />
             <div className="pt-16">
               <AdminBookingsPage />
@@ -135,7 +135,7 @@ const AppContent: React.FC = () => {
         } />
         
         <Route path="/admin/reviews" element={
-          <ProtectedRoute requireOwner>
+          <ProtectedRoute requireHost>
             <Navbar />
             <div className="pt-16">
               <AdminReviewsPage />
