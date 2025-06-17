@@ -18,6 +18,7 @@ import { ManageAvailability } from './pages/ManageAvailability';
 import { SettingsPage } from './pages/SettingsPage';
 import { AdminBookingsPage } from './pages/AdminBookingsPage';
 import { AdminReviewsPage } from './pages/AdminReviewsPage';
+import NotFound from './pages/NotFound';
 
 const AppContent: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -41,57 +42,109 @@ const AppContent: React.FC = () => {
           element={user ? <Navigate to={user.userType === 'owner' ? '/admin' : '/'} replace /> : <LoginPage />} 
         />
         
-        {/* Protected Routes */}
-        <Route path="/app/*" element={
+        {/* Protected Routes with Navbar */}
+        <Route path="/spot/:id" element={
           <ProtectedRoute>
             <Navbar />
             <div className="pt-16">
-              <Routes>
-                {/* Customer Routes */}
-                <Route path="/home" element={
-                  user?.userType === 'owner' ? <Navigate to="/admin" replace /> : <Index />
-                } />
-                <Route path="/spot/:id" element={<ParkingSpotDetail />} />
-                <Route path="/book/:id" element={<BookingPage />} />
-                <Route path="/bookings" element={<BookingsPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                
-                {/* Owner-only routes */}
-                <Route path="/admin" element={
-                  <ProtectedRoute requireOwner>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/add-spot" element={
-                  <ProtectedRoute requireOwner>
-                    <AddParkingSpot />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/edit-spot/:id" element={
-                  <ProtectedRoute requireOwner>
-                    <EditParkingSpot />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/availability/:id" element={
-                  <ProtectedRoute requireOwner>
-                    <ManageAvailability />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/bookings" element={
-                  <ProtectedRoute requireOwner>
-                    <AdminBookingsPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/reviews" element={
-                  <ProtectedRoute requireOwner>
-                    <AdminReviewsPage />
-                  </ProtectedRoute>
-                } />
-              </Routes>
+              <ParkingSpotDetail />
             </div>
           </ProtectedRoute>
         } />
+        
+        <Route path="/book/:id" element={
+          <ProtectedRoute>
+            <Navbar />
+            <div className="pt-16">
+              <BookingPage />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/bookings" element={
+          <ProtectedRoute>
+            <Navbar />
+            <div className="pt-16">
+              <BookingsPage />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Navbar />
+            <div className="pt-16">
+              <ProfilePage />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <Navbar />
+            <div className="pt-16">
+              <SettingsPage />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        {/* Owner-only routes */}
+        <Route path="/admin" element={
+          <ProtectedRoute requireOwner>
+            <Navbar />
+            <div className="pt-16">
+              <AdminDashboard />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/admin/add-spot" element={
+          <ProtectedRoute requireOwner>
+            <Navbar />
+            <div className="pt-16">
+              <AddParkingSpot />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/admin/edit-spot/:id" element={
+          <ProtectedRoute requireOwner>
+            <Navbar />
+            <div className="pt-16">
+              <EditParkingSpot />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/admin/availability/:id" element={
+          <ProtectedRoute requireOwner>
+            <Navbar />
+            <div className="pt-16">
+              <ManageAvailability />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/admin/bookings" element={
+          <ProtectedRoute requireOwner>
+            <Navbar />
+            <div className="pt-16">
+              <AdminBookingsPage />
+            </div>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/admin/reviews" element={
+          <ProtectedRoute requireOwner>
+            <Navbar />
+            <div className="pt-16">
+              <AdminReviewsPage />
+            </div>
+          </ProtectedRoute>
+        } />
+
+        {/* 404 Route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

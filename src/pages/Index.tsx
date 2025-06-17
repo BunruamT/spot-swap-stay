@@ -1,3 +1,4 @@
+
 import { useAuth } from '../context/AuthContext';
 import { LandingPage } from './LandingPage';
 import { HomePage } from './HomePage';
@@ -18,8 +19,14 @@ const Index = () => {
     return <LandingPage />;
   }
 
-  // Show home page for authenticated users
-  return <HomePage />;
+  // Show home page for authenticated users with navbar
+  return (
+    <>
+      <div className="pt-16">
+        <HomePage />
+      </div>
+    </>
+  );
 };
 
 export default Index;
